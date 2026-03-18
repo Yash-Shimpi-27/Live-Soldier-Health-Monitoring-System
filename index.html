@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARES | Soldier Health Monitoring</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Background elements -->
+        <div class="bg-grid"></div>
+        <div class="bg-gradient"></div>
+
+        <!-- Login Screen -->
+        <section id="login-screen" class="view active">
+            <div class="glass-panel login-panel">
+                <div class="logo-container">
+                    <div class="logo-icon pulse"></div>
+                    <h1>A.R.E.S.</h1>
+                    <p class="subtitle">Advanced Recon & Evac System</p>
+                </div>
+                <form id="login-form">
+                    <div class="input-group">
+                        <label for="username">Operator ID</label>
+                        <input type="text" id="username" placeholder="Enter Operator ID" required autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Passcode</label>
+                        <input type="password" id="password" placeholder="•••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <span>Authenticate</span>
+                        <div class="scan-line"></div>
+                    </button>
+                </form>
+                <p id="login-error" class="error-msg"></p>
+            </div>
+        </section>
+
+        <!-- Dashboard Screen -->
+        <section id="dashboard-screen" class="view">
+            <header class="glass-header">
+                <div class="header-left">
+                    <div class="logo-icon small"></div>
+                    <h2>A.R.E.S. COMMAND</h2>
+                </div>
+                <div class="header-right">
+                    <div class="status-indicator online"></div>
+                    <span>LINK ACTIVE</span>
+                    <button id="logout-btn" class="btn-secondary">SECURE LOGOUT</button>
+                </div>
+            </header>
+
+            <main class="dashboard-grid">
+                <!-- Sidebar: Soldier List -->
+                <aside class="glass-panel sidebar">
+                    <h3>Active Units</h3>
+                    <ul class="unit-list">
+                        <li class="unit active" data-id="S-01">
+                            <div class="unit-avatar"></div>
+                            <div class="unit-info">
+                                <span class="unit-name">SGT. REYES, J.</span>
+                                <span class="unit-role">Recon Alpha</span>
+                            </div>
+                            <div class="unit-status healthy"></div>
+                        </li>
+                        <li class="unit" data-id="S-02">
+                            <div class="unit-avatar"></div>
+                            <div class="unit-info">
+                                <span class="unit-name">CPL. VANCE, D.</span>
+                                <span class="unit-role">Medic</span>
+                            </div>
+                            <div class="unit-status warning"></div>
+                        </li>
+                    </ul>
+                </aside>
+
+                <!-- Main Content: Vitals -->
+                <div class="main-vitals">
+                    <div class="vital-card hr-card glass-panel">
+                        <div class="card-header">
+                            <h4>HEART RATE</h4>
+                            <span class="icon">❤️</span>
+                        </div>
+                        <div class="vital-value">
+                            <span id="val-hr" class="number">78</span>
+                            <span class="unit">BPM</span>
+                        </div>
+                        <div class="ecg-container">
+                            <canvas id="ecgChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="vital-card spo2-card glass-panel">
+                        <div class="card-header">
+                            <h4>BLOOD OXYGEN</h4>
+                            <span class="icon">O₂</span>
+                        </div>
+                        <div class="vital-value">
+                            <span id="val-spo2" class="number">98</span>
+                            <span class="unit">%</span>
+                        </div>
+                        <div class="progress-ring-container">
+                            <svg class="progress-ring" width="120" height="120">
+                                <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                                <circle class="progress-ring-circle" id="spo2-ring" stroke="#00f3ff" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="vital-card temp-card glass-panel">
+                        <div class="card-header">
+                            <h4>BODY TEMP</h4>
+                            <span class="icon">🌡️</span>
+                        </div>
+                        <div class="vital-value">
+                            <span id="val-temp" class="number">36.5</span>
+                            <span class="unit">°C</span>
+                        </div>
+                        <div class="temp-bar-container">
+                            <div class="temp-bar">
+                                <div class="temp-fill" id="temp-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vital-card map-card glass-panel">
+                        <div class="card-header">
+                            <h4>LOCATION & MOVEMENT</h4>
+                            <span class="icon">🎯</span>
+                        </div>
+                        <div class="map-view">
+                            <div class="radar">
+                                <div class="radar-sweep"></div>
+                                <div class="target-blip"></div>
+                            </div>
+                            <div class="coords">
+                                <span id="val-lat">LAT: 34.0522 N</span>
+                                <span id="val-lng">LNG: 118.2437 W</span>
+                            </div>
+                        </div>
+                        <div class="movement-status">
+                            <span>ACTIVITY: </span>
+                            <span id="val-movement" class="status-badge moving">PATROL</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
