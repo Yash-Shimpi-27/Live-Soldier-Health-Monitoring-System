@@ -404,6 +404,10 @@ body {
     overflow-y: auto;
     padding: 2rem;
     display: none;
+    /* Center the layout on very wide screens so it doesn't span to infinity */
+    max-width: 1800px;
+    margin: 0 auto;
+    width: 100%;
 }
 .content-view.active {
     display: block;
@@ -470,8 +474,8 @@ body {
 
 .units-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
 }
 
 /* Unit Card */
