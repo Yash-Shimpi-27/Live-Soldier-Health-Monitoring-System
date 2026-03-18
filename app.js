@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const statuses = ['normal', 'normal', 'normal', 'warning', 'critical'];
         const movements = ['Active', 'Stationary', 'Running', 'Fall Detected', 'No Movement'];
         
-        for(let i=1; i<=12; i++) {
+        for(let i=1; i<=24; i++) {
             const id = `UN-${i.toString().padStart(3, '0')}`;
             // Randomly assign a status to mock reality
             const statusIdx = Math.floor(Math.random() * statuses.length);
@@ -157,16 +157,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function switchView(viewId) {
         contentViews.forEach(view => {
-            view.classList.remove('active');
-            setTimeout(() => view.classList.add('hidden'), 300); // Wait for transition
+            if (view.id === viewId) {
+                // Show the target view immediately
+                view.classList.remove('hidden');
+                setTimeout(() => {
+                    view.classList.remove('hidden');
+                    view.classList.add('active');
+                }, 50);
+            } else {
+                // Hide other views
+                view.classList.remove('active');
+                setTimeout(() => {
+                    if (!view.classList.contains('active')) {
+                        view.classList.add('hidden');
+                    }
+                }, 300);
+            }
         });
-
-        const targetView = document.getElementById(viewId);
-        if(targetView) {
-            targetView.classList.remove('hidden');
-            // Small delay to allow display:block to apply before opacity transition
-            setTimeout(() => targetView.classList.add('active'), 50);
-        }
     }
 
     // --- Dashboard Rendering ---
@@ -415,3 +422,4 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupEventListeners() {}
 
 });
+
