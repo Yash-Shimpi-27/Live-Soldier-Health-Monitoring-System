@@ -1,6 +1,6 @@
 // Wait for DOM
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // --- State Management ---
     const state = {
         isAuthenticated: false,
@@ -17,12 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const units = [];
         const statuses = ['normal', 'normal', 'normal', 'warning', 'critical'];
         const movements = ['Active', 'Stationary', 'Running', 'Fall Detected', 'No Movement'];
-        
-        for(let i=1; i<=24; i++) {
+
+        for (let i = 1; i <= 24; i++) {
             const id = `UN-${i.toString().padStart(3, '0')}`;
             // Randomly assign a status to mock reality
             const statusIdx = Math.floor(Math.random() * statuses.length);
-            
+
             // Generate values based on assigned status
             let status = statuses[statusIdx];
             let hr = Math.floor(Math.random() * (100 - 60) + 60);
@@ -31,12 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
             let gas = 'Safe';
             let movement = movements[Math.floor(Math.random() * 3)]; // Active, Stationary, Running
 
-            if(status === 'critical') {
+            if (status === 'critical') {
                 const criticalType = Math.floor(Math.random() * 4);
-                if(criticalType === 0) hr = Math.floor(Math.random() * 40 + 30); // Low HR
-                if(criticalType === 1) spo2 = Math.floor(Math.random() * 10 + 80); // Low SpO2
-                if(criticalType === 2) movement = 'Fall Detected';
-                if(criticalType === 3) gas = 'Hazardous';
+                if (criticalType === 0) hr = Math.floor(Math.random() * 40 + 30); // Low HR
+                if (criticalType === 1) spo2 = Math.floor(Math.random() * 10 + 80); // Low SpO2
+                if (criticalType === 2) movement = 'Fall Detected';
+                if (criticalType === 3) gas = 'Hazardous';
             } else if (status === 'warning') {
                 hr = Math.floor(Math.random() * 20 + 100); // Elevated HR
                 temp = (Math.random() * (39.0 - 37.6) + 37.6).toFixed(1); // Fever
@@ -55,8 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     movement: movement
                 },
                 location: {
-                    lat: (Math.random() * 180 - 90).toFixed(6),
-                    lng: (Math.random() * 360 - 180).toFixed(6)
+                    lat: (18.524952 + (Math.random() * 0.05 - 0.025)).toFixed(6),
+                    lng: (73.851514 + (Math.random() * 0.05 - 0.025)).toFixed(6)
                 }
             });
         }
@@ -70,18 +70,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const appContainer = document.getElementById('app-container');
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
-    
+
     // Navigation
     const navItems = document.querySelectorAll('.nav-item');
     const contentViews = document.querySelectorAll('.content-view');
     const logoutBtn = document.getElementById('logout-btn');
     const liveDatetime = document.getElementById('live-datetime');
-    
+
     // Dashboard Components
     const unitsContainer = document.getElementById('units-container');
     const searchInput = document.getElementById('search-input');
     const filterBtns = document.querySelectorAll('.filter-btn');
-    
+
     // Detail View Components
     const detailView = document.getElementById('unit-detail-view');
     const backBtn = document.getElementById('back-to-dash');
@@ -101,12 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const user = document.getElementById('username').value;
         const pass = document.getElementById('password').value;
-        
+
         // Dummy Check
-        if(user && pass) {
+        if (user && pass) {
             loginError.style.display = 'none';
             state.isAuthenticated = true;
-            
+
             // UI Transition
             loginPage.classList.remove('active');
             setTimeout(() => {
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     appContainer.classList.add('active'); // fade in
                 }, 50);
             }, 300);
-            
+
             showNotification('Authentication Successful', 'success');
         } else {
             loginError.style.display = 'block';
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     navItems.forEach(item => {
         item.addEventListener('click', () => {
             const targetId = item.getAttribute('data-target');
-            if(!targetId) return;
+            if (!targetId) return;
 
             // Update Nav UI
             navItems.forEach(nav => nav.classList.remove('active'));
@@ -180,19 +180,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderDashboard() {
         // filter & search
         let filteredUnits = state.units.filter(unit => {
-            const matchesSearch = unit.name.toLowerCase().includes(state.searchTerm.toLowerCase()) || 
-                                  unit.id.toLowerCase().includes(state.searchTerm.toLowerCase());
+            const matchesSearch = unit.name.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
+                unit.id.toLowerCase().includes(state.searchTerm.toLowerCase());
             const matchesFilter = state.filter === 'all' || unit.status === state.filter;
             return matchesSearch && matchesFilter;
         });
 
         unitsContainer.innerHTML = '';
-        
+
         filteredUnits.forEach(unit => {
             const card = document.createElement('div');
             card.className = `unit-card status-${unit.status}`;
             card.onclick = () => openUnitDetail(unit);
-            
+
             card.innerHTML = `
                 <div class="card-header">
                     <div>
@@ -207,8 +207,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="${getHrColorClass(unit.vitals.hr)}">${unit.vitals.hr} <small class="unit">bpm</small></span>
                     </div>
                     <div class="mini-vital">
+                        <i class="fa-solid fa-lungs"></i>
+                        <span class="${getSpO2ColorClass(unit.vitals.spo2)}">${unit.vitals.spo2} <small class="unit">%</small></span>
+                    </div>
+                    <div class="mini-vital">
                         <i class="fa-solid fa-temperature-half"></i>
                         <span class="${getTempColorClass(unit.vitals.temp)}">${unit.vitals.temp} <small class="unit">°C</small></span>
+                    </div>
+                    <div class="mini-vital">
+                        <i class="fa-solid fa-smog"></i>
+                        <span class="${unit.vitals.gas === 'Safe' ? 'green' : 'red'}">${unit.vitals.gas}</span>
+                    </div>
+                    <div class="mini-vital" style="grid-column: span 2;">
+                        <i class="fa-solid fa-person-running"></i>
+                        <span class="${['Fall Detected', 'No Movement'].includes(unit.vitals.movement) ? 'red' : 'green'}">${unit.vitals.movement}</span>
                     </div>
                 </div>
                 <div class="card-time">
@@ -231,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('stat-normal').innerText = normal;
         document.getElementById('stat-warning').innerText = warning;
         document.getElementById('stat-critical').innerText = critical;
-        
+
         document.getElementById('nav-alert-count').innerText = critical;
     }
 
@@ -253,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Unit Detail View ---
     function openUnitDetail(unit) {
         state.selectedUnitId = unit.id;
-        
+
         // Populate Data
         document.getElementById('detail-unit-name').innerText = `${unit.name} (${unit.id})`;
         document.getElementById('detail-status-badge').innerText = unit.status;
@@ -262,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Vitals
         document.getElementById('detail-hr').innerText = unit.vitals.hr;
         document.getElementById('detail-hr').className = getHrColorClass(unit.vitals.hr);
-        
+
         document.getElementById('detail-spo2').innerText = unit.vitals.spo2;
         document.getElementById('detail-spo2').className = getSpO2ColorClass(unit.vitals.spo2);
         document.getElementById('fill-spo2').style.width = `${unit.vitals.spo2}%`;
@@ -277,14 +289,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Environment
         document.getElementById('detail-movement').innerText = unit.vitals.movement;
-        if(unit.vitals.movement === 'Fall Detected' || unit.vitals.movement === 'No Movement') {
+        if (unit.vitals.movement === 'Fall Detected' || unit.vitals.movement === 'No Movement') {
             document.getElementById('detail-movement').className = 'vital-value-text red';
         } else {
             document.getElementById('detail-movement').className = 'vital-value-text';
         }
 
         document.getElementById('detail-gas').innerText = unit.vitals.gas;
-        if(unit.vitals.gas !== 'Safe') {
+        if (unit.vitals.gas !== 'Safe') {
             document.getElementById('detail-gas').className = 'vital-value-text red';
             document.getElementById('fill-gas').style.width = '100%';
             document.getElementById('fill-gas').style.backgroundColor = 'var(--status-red)';
@@ -301,57 +313,57 @@ document.addEventListener('DOMContentLoaded', () => {
         // Switch to detail view
         navItems.forEach(nav => nav.classList.remove('active')); // Deselect sidebar
         switchView('unit-detail-view');
-        
+
         checkForItemLevelAlerts(unit);
     }
 
     function checkForItemLevelAlerts(unit) {
         // Highlighting entire cards if critical
         document.querySelectorAll('.vital-card').forEach(c => c.classList.remove('alert'));
-        
+
         if (unit.status === 'critical') {
-            if(unit.vitals.hr < 50 || unit.vitals.hr > 120) document.getElementById('card-heart-rate').classList.add('alert');
-            if(unit.vitals.spo2 < 90) document.getElementById('card-spo2').classList.add('alert');
-            if(unit.vitals.movement === 'Fall Detected') document.getElementById('card-movement').classList.add('alert');
-            if(unit.vitals.gas !== 'Safe') document.getElementById('card-gas').classList.add('alert');
+            if (unit.vitals.hr < 50 || unit.vitals.hr > 120) document.getElementById('card-heart-rate').classList.add('alert');
+            if (unit.vitals.spo2 < 90) document.getElementById('card-spo2').classList.add('alert');
+            if (unit.vitals.movement === 'Fall Detected') document.getElementById('card-movement').classList.add('alert');
+            if (unit.vitals.gas !== 'Safe') document.getElementById('card-gas').classList.add('alert');
         }
     }
 
     // --- Helpers ---
     function getHrColorClass(hr) {
-        if(hr < 50 || hr > 130) return 'red';
-        if(hr < 60 || hr > 100) return 'yellow';
+        if (hr < 50 || hr > 130) return 'red';
+        if (hr < 60 || hr > 100) return 'yellow';
         return 'green';
     }
     function getSpO2ColorClass(spo2) {
-        if(spo2 < 90) return 'red';
-        if(spo2 < 95) return 'yellow';
+        if (spo2 < 90) return 'red';
+        if (spo2 < 95) return 'yellow';
         return 'green';
     }
     function getTempColorClass(temp) {
-        if(temp < 36.0 || temp > 39.0) return 'red';
-        if(temp > 37.5) return 'yellow';
+        if (temp < 36.0 || temp > 39.0) return 'red';
+        if (temp > 37.5) return 'yellow';
         return 'green';
     }
     function getBadgeClass(status) {
-        if(status === 'normal') return 'bg-green';
-        if(status === 'warning') return 'bg-yellow';
+        if (status === 'normal') return 'bg-green';
+        if (status === 'warning') return 'bg-yellow';
         return 'bg-red';
     }
     function getColorByStatusClass(str) {
-        if(str === 'red') return 'var(--status-red)';
-        if(str === 'yellow') return 'var(--status-yellow)';
+        if (str === 'red') return 'var(--status-red)';
+        if (str === 'yellow') return 'var(--status-yellow)';
         return 'var(--status-green)';
     }
 
     // --- Alerts System ---
     function calculateAlerts() {
         state.units.forEach(unit => {
-            if(unit.status === 'critical') {
-                if(unit.vitals.hr < 50) showNotification(`${unit.name}: Low Heart Rate Detected`, 'critical');
-                if(unit.vitals.movement === 'Fall Detected') showNotification(`${unit.name}: Fall Detected!`, 'critical');
-                if(unit.vitals.gas !== 'Safe') showNotification(`${unit.name}: Harmful Gas Detected!`, 'critical');
-                if(unit.vitals.spo2 < 90) showNotification(`${unit.name}: Low Oxygen Levels!`, 'critical');
+            if (unit.status === 'critical') {
+                if (unit.vitals.hr < 50) showNotification(`${unit.name}: Low Heart Rate Detected`, 'critical');
+                if (unit.vitals.movement === 'Fall Detected') showNotification(`${unit.name}: Fall Detected!`, 'critical');
+                if (unit.vitals.gas !== 'Safe') showNotification(`${unit.name}: Harmful Gas Detected!`, 'critical');
+                if (unit.vitals.spo2 < 90) showNotification(`${unit.name}: Low Oxygen Levels!`, 'critical');
             }
         });
     }
@@ -360,11 +372,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('notification-container');
         const alertBox = document.createElement('div');
         alertBox.className = 'notification';
-        
+
         let icon = 'fa-info-circle';
-        if(type === 'critical') icon = 'fa-triangle-exclamation';
-        if(type === 'success') icon = 'fa-check-circle';
-        
+        if (type === 'critical') icon = 'fa-triangle-exclamation';
+        if (type === 'success') icon = 'fa-check-circle';
+
         alertBox.innerHTML = `
             <i class="fa-solid ${icon} fa-lg"></i>
             <div>${msg}</div>
@@ -375,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             alertBox.style.opacity = '0';
             setTimeout(() => {
-                if(container.contains(alertBox)) container.removeChild(alertBox);
+                if (container.contains(alertBox)) container.removeChild(alertBox);
             }, 300);
         }, 5000);
     }
@@ -389,21 +401,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Simulate data updates every 10 seconds
         setInterval(() => {
-            if(state.isAuthenticated) {
+            if (state.isAuthenticated) {
                 // slightly tweak hr values for realism
                 state.units.forEach(u => {
                     const diff = Math.floor(Math.random() * 5) - 2; // -2 to +2
                     u.vitals.hr = Math.max(30, Math.min(200, u.vitals.hr + diff));
                     u.lastUpdated = new Date().toLocaleTimeString();
                 });
-                
+
                 // If viewing dashboard, re-render safely (avoid jumping if user is reading)
-                if(state.activeView === 'dashboard-view') {
+                if (state.activeView === 'dashboard-view') {
                     // update just the values inside DOM to avoid tearing down cards completely
                     updateDashboardLiveValues();
-                } else if(state.activeView === 'unit-detail-view' && state.selectedUnitId) {
+                } else if (state.activeView === 'unit-detail-view' && state.selectedUnitId) {
                     const activeU = state.units.find(u => u.id === state.selectedUnitId);
-                    if(activeU) openUnitDetail(activeU); // re-render detail
+                    if (activeU) openUnitDetail(activeU); // re-render detail
                 }
             }
         }, 10000);
@@ -419,6 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderDashboard(); // We'll just re-render for simplicity in this demo.
     }
 
-    function setupEventListeners() {}
+    function setupEventListeners() { }
 
 });
+
