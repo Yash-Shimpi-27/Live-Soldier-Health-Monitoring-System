@@ -326,6 +326,8 @@ body {
     color: var(--status-green);
     font-size: 0.875rem;
     letter-spacing: 1px;
+    font-weight: bold;
+    text-shadow: 0 0 8px var(--status-green);
 }
 
 /* Live Indicator */
