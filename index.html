@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Soldier Health Monitoring System</title>
+    <meta name="description" content="Dashboard for real-time monitoring of active soldier units' health and location metrics.">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Notification System -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Login Page -->
+    <div id="login-page" class="view-section active">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="logo-wrapper">
+                    <i class="fa-solid fa-shield-heart"></i>
+                </div>
+                <h2>Live Soldier Health Monitoring System</h2>
+                <p class="subtitle">Secure Access Portal</p>
+                <form id="login-form">
+                    <div class="input-group">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="username" placeholder="Username" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="password" placeholder="Password" required>
+                    </div>
+                    <div class="error-msg" id="login-error">Invalid credentials. Please try again.</div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        AUTHENTICATE <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </button>
+                    <div class="auth-hint">
+                        <strong>Hint:</strong> Any username / password works.
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Application -->
+    <div id="app-container" class="view-section hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-shield-heart fa-2x"></i>
+                <div class="brand">
+                    <span class="title">SHMS</span>
+                    <span class="version">v2.1.4</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item active" data-target="dashboard-view">
+                        <i class="fa-solid fa-border-all"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li class="nav-item" data-target="units-view">
+                        <i class="fa-solid fa-users-viewfinder"></i>
+                        <span>All Units</span>
+                    </li>
+                    <li class="nav-item" data-target="alerts-view">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>System Alerts</span>
+                        <span class="badge" id="nav-alert-count">0</span>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn btn-logout">
+                    <i class="fa-solid fa-power-off"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="page-title">
+                    <h1 id="current-page-title">Soldier Active Units</h1>
+                    <div class="datetime-display" id="live-datetime">--:--:--</div>
+                </div>
+
+                <div class="topbar-actions">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input" placeholder="Search Unit ID or Name...">
+                    </div>
+                    
+                    <div class="status-legend">
+                        <div class="legend-item"><span class="dot green"></span> Normal</div>
+                        <div class="legend-item"><span class="dot yellow"></span> Warning</div>
+                        <div class="legend-item"><span class="dot red"></span> Critical</div>
+                    </div>
+
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Commander&background=1f2937&color=10b981" alt="Commander Profile" class="avatar">
+                        <span class="role">Cmdr. Systems</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Overview View (Dashboard Dashboard) -->
+            <section id="dashboard-view" class="content-view active">
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fa-solid fa-user-astronaut"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Units</h3>
+                            <h2 id="stat-total">0</h2>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fa-solid fa-heart-circle-check"></i></div>
+                        <div class="stat-info">
+                            <h3>Stable Status</h3>
+                            <h2 id="stat-normal">0</h2>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow"><i class="fa-solid fa-person-falling"></i></div>
+                        <div class="stat-info">
+                            <h3>Warnings</h3>
+                            <h2 id="stat-warning">0</h2>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red"><i class="fa-solid fa-heart-pulse"></i></div>
+                        <div class="stat-info">
+                            <h3>Critical Alerts</h3>
+                            <h2 id="stat-critical">0</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <h2>Active Units Overview</h2>
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="critical">Critical</button>
+                    </div>
+                </div>
+
+                <div class="units-grid" id="units-container">
+                    <!-- Unit Cards Injected Here via JS -->
+                </div>
+            </section>
+
+            <!-- Detailed Unit View (Hidden by default) -->
+            <section id="unit-detail-view" class="content-view hidden">
+                <div class="detail-header">
+                    <button class="btn btn-icon btn-back" id="back-to-dash">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                    <h2 id="detail-unit-name">Unit 00</h2>
+                    <span id="detail-status-badge" class="status-badge">Unknown</span>
+                </div>
+
+                <div class="vital-panels-grid">
+                    <!-- Panel 1: Heart Rate -->
+                    <div class="vital-panel" id="panel-hr">
+                        <div class="panel-top">
+                            <span class="panel-title-text">HEART RATE</span>
+                            <i class="fa-solid fa-heart panel-icon red"></i>
+                        </div>
+                        <div class="panel-main-value">
+                            <span id="detail-hr" class="large-value">--</span>
+                            <span class="unit-pill pill-red">BPM</span>
+                        </div>
+                        <div class="panel-graphic">
+                            <svg viewBox="0 0 500 100" class="ecg-line" preserveAspectRatio="none">
+                                <polyline points="0,50 50,50 60,40 70,60 85,10 100,80 115,50 160,50 170,40 180,60 195,10 210,80 225,50 270,50 280,40 290,60 305,10 320,80 335,50 380,50 390,40 400,60 415,10 430,80 445,50 500,50"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Panel 2: Blood Oxygen -->
+                    <div class="vital-panel" id="panel-spo2">
+                        <div class="panel-top">
+                            <span class="panel-title-text">BLOOD OXYGEN</span>
+                            <span class="panel-icon right-text">O₂</span>
+                        </div>
+                        <div class="panel-main-value">
+                            <span id="detail-spo2" class="large-value">--</span>
+                            <span class="unit-pill pill-cyan">%</span>
+                        </div>
+                        <div class="panel-graphic right-align">
+                            <div class="circular-progress">
+                                <svg viewBox="0 0 100 100">
+                                    <circle class="bg" cx="50" cy="50" r="40"></circle>
+                                    <circle class="progress" id="circle-spo2" cx="50" cy="50" r="40"></circle>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel 3: Body Temp -->
+                    <div class="vital-panel" id="panel-temp">
+                        <div class="panel-top">
+                            <span class="panel-title-text">BODY TEMP</span>
+                            <i class="fa-solid fa-temperature-half panel-icon blue"></i>
+                        </div>
+                        <div class="panel-main-value">
+                            <span id="detail-temp" class="large-value">--</span>
+                            <span class="unit-pill">°C</span>
+                        </div>
+                        <div class="panel-graphic bottom-bar-container">
+                            <div class="horizontal-bar">
+                                <div class="bar-fill" id="bar-temp"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel 4: Movement -->
+                    <div class="vital-panel" id="panel-movement">
+                        <div class="panel-top">
+                            <span class="panel-title-text">MOVEMENT</span>
+                            <i class="fa-solid fa-person-running panel-icon orange"></i>
+                        </div>
+                        <div class="panel-main-value">
+                            <span id="detail-movement-main" class="large-value" style="font-size: 2.5rem;">STATIONARY</span>
+                        </div>
+                        <div class="panel-graphic center-content">
+                            <i id="movement-icon-large" class="fa-solid fa-person-walking" style="font-size: 4rem; color: #f59e0b; filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));"></i>
+                        </div>
+                    </div>
+
+                    <!-- Panel 5: Gas Detection -->
+                    <div class="vital-panel" id="panel-gas">
+                        <div class="panel-top">
+                            <span class="panel-title-text">AIR QUALITY</span>
+                            <i class="fa-solid fa-smog panel-icon green"></i>
+                        </div>
+                        <div class="panel-main-value">
+                            <span id="detail-gas-main" class="large-value" style="font-size: 2.5rem;">SAFE</span>
+                        </div>
+                        <div class="panel-graphic bottom-bar-container">
+                            <div class="horizontal-bar">
+                                <div class="bar-fill" id="bar-gas" style="background: var(--status-green); width: 10%; box-shadow: 0 0 10px var(--status-green);"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel 6: GPS Location -->
+                    <div class="vital-panel" id="panel-location">
+                        <div class="panel-top">
+                            <span class="panel-title-text">GPS LOCATION</span>
+                            <i class="fa-solid fa-map-location-dot panel-icon purp"></i>
+                        </div>
+                        <div class="panel-graphic center-content location-content">
+                            <iframe id="google-map-iframe" width="100%" height="150" style="border:0; border-radius: 8px; filter: invert(90%) hue-rotate(180deg) brightness(85%); margin-top: 0.5rem;" loading="lazy" allowfullscreen></iframe>
+                        </div>
+                        <div class="panel-bottom-row" style="position: relative; right: auto; bottom: auto; justify-content: space-between; margin-top: 1rem; width: 100%;">
+                            <div class="coords-box" id="detail-coords-box" style="margin: 0; padding: 0.5rem;">
+                                <div id="detail-lat">LAT: 0.0000 N</div>
+                                <div id="detail-lng">LNG: 0.0000 E</div>
+                            </div>
+                            <a href="#" id="detail-map-link" target="_blank" class="activity-pill" style="text-decoration: none; display: flex; align-items: center;">OPEN MAPS</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Application Script -->
+    <script src="js/app.js"></script>
+</body>
+</html>
