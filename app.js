@@ -122,8 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = document.getElementById('username').value;
         const pass = document.getElementById('password').value;
 
-        // Dummy Check
-        if (user && pass) {
+        // --- UPDATE CREDENTIALS HERE ---
+        // Change 'admin' and 'admin123' to whatever username and password you want
+        if (user === 'admin' && pass === '123') {
             loginError.style.display = 'none';
             state.isAuthenticated = true;
 
